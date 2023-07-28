@@ -2,11 +2,11 @@
   <header class="header">
     <Logo />
 
-    <h2 class="site-title">Color Avatar</h2>
+    <h2 class="site-title">Аватар 24</h2>
 
     <div class="header-right">
       <a
-        href="https://github.com/Codennnn/vue-color-avatar"
+        href="https://nebo.me"
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
@@ -19,8 +19,8 @@
             })
           "
         >
-          <img :src="IconGitHub" alt="GitHub" />
-          <span class="text">GitHub</span>
+
+          <span class="text">nebo.me</span>
         </button>
       </a>
     </div>

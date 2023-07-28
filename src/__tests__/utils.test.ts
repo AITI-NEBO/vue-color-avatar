@@ -1,5 +1,5 @@
 import localeEN from '../i18n/locales/en'
-import localeZH from '../i18n/locales/zh'
+import localeRU from '../i18n/locales/ru'
 import { highlightJSON } from '../utils'
 
 test('highlightJSON', () => {
@@ -24,7 +24,7 @@ const getKeys = (target: Record<string, any>) => {
 }
 
 test('check locales completeness', () => {
-  const zh = getKeys(localeZH).sort()
+  const ru = getKeys(localeRU).sort()
   const en = getKeys(localeEN).sort()
-  expect(zh).toEqual(en)
+  expect(ru).toEqual(en)
 })

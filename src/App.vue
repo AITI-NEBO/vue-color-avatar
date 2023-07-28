@@ -48,6 +48,13 @@
               >
                 {{ t('action.downloadMultiple') }}
               </button>
+              <button
+                type="button"
+                class="action-btn action-multiple"
+                @click="() => handleSetAvatar()"
+              >
+                {{ t('action.setAvatar') }}
+              </button>
             </div>
           </div>
 
@@ -85,6 +92,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { Method } from '@sknebo/bitrix-js'
 import { ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -109,6 +117,7 @@ import {
   getSpecialAvatarOption,
   showConfetti,
 } from '@/utils'
+import bitrix from '@/utils/bitrixLogin'
 import {
   DOWNLOAD_DELAY,
   NOT_COMPATIBLE_AGENTS,
@@ -169,7 +178,7 @@ async function handleDownload() {
         backgroundColor: null,
       })
       const dataURL = canvas.toDataURL()
-
+      console.log(dataURL)
       if (notCompatible) {
         imageDataURL.value = dataURL
         downloadModalVisible.value = true
@@ -184,6 +193,97 @@ async function handleDownload() {
     recordEvent('click_download', {
       event_category: 'click',
     })
+  } finally {
+    setTimeout(() => {
+      downloading.value = false
+    }, DOWNLOAD_DELAY)
+  }
+}
+async function handleSetAvatar() {
+  try {
+    downloading.value = true
+    const avatarEle = colorAvatarRef.value?.avatarRef
+
+    const userAgent = window.navigator.userAgent.toLowerCase()
+    const notCompatible = NOT_COMPATIBLE_AGENTS.some(
+      (agent) => userAgent.indexOf(agent) !== -1
+    )
+
+    if (avatarEle) {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(avatarEle, {
+        backgroundColor: null,
+      })
+      console.log(canvas)
+
+      const dataURL = canvas.toDataURL('image/png')
+      var formData = new FormData();
+      var dataBlob = new Blob([dataURL], { type: 'image/png' });
+
+      const imageFile = new File([dataBlob], 'image.png', { type: 'image/png' });
+
+
+      if (notCompatible) {
+        imageDataURL.value = dataURL
+        downloadModalVisible.value = true
+      } else {
+
+        bitrix.call('profile' as Method, {}).then((response: any) => {
+          console.log(response)
+
+          bitrix
+            .call('disk.storage.getforapp' as Method, {})
+            .then((responseDisk: any) => {
+              console.log(responseDisk)
+              bitrix
+                .call('disk.storage.uploadfile' as Method, {
+                  id: responseDisk.result.ID,
+                  data: {
+                    NAME: `${appName}.png`,
+                  },
+                  fileContent: [appName, `${dataURL}`.split('base64,')[1]],
+                  generateUniqueName: true,
+                })
+                .then((uploadUrl: any) => {
+                  const dataURL = canvas.toDataURL('image/png')
+                  var dataBlob = new Blob([dataURL], { type: 'image/png' });
+
+                  const imageFile = new File([dataBlob], 'image.png', { type: 'image/png' });
+                  console.log(imageFile)
+
+                  const userData = {
+                    ID: response.result.ID,
+
+                    PERSONAL_PHOTO: uploadUrl,
+
+
+                  }
+                  bitrix
+                    .call('user.update', userData)
+                    .then((result) => {
+                      console.log(
+                        'Аватар пользователя успешно обновлен:',
+                        result
+                      )
+                      bitrix.call('user.current').then((current)=>{
+                        console.log(current)
+                      })
+                    })
+                    .catch((error) => {
+                      console.error(
+                        'Ошибка при обновлении аватара пользователя:',
+                        error
+                      )
+                    })
+                })
+            })
+        })
+
+        recordEvent('click_download', {
+          event_category: 'click',
+        })
+      }
+    }
   } finally {
     setTimeout(() => {
       downloading.value = false

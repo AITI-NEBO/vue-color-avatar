@@ -1,5 +1,5 @@
 export const enum Locale {
-  ZH = 'zh',
+  RU = 'ru',
   EN = 'en',
 }
 

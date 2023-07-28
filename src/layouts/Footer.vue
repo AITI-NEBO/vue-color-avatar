@@ -3,21 +3,21 @@
     <div
       data-message="If you are deploying to your own public website, please do not modify it unless you have permission from the original author."
     >
-      Made by
+      Сделано в
       <a
         class="link"
-        href="https://leoku.top"
+        href="https://nebo.me"
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        LeoKu
+        nebo.me
       </a>
     </div>
 
     <div class="divider">|</div>
 
     <div class="locale" @click="switchLocale">
-      {{ locale === Locale.EN ? '简体中文' : 'English' }}
+      {{ locale === Locale.RU ? 'Русский' : 'English' }}
     </div>
   </footer>
 </template>
@@ -30,7 +30,8 @@ import { Locale } from '@/enums'
 const { locale } = useI18n()
 
 function switchLocale() {
-  locale.value = locale.value === Locale.EN ? Locale.ZH : Locale.EN
+  console.log(locale.value)
+  locale.value = locale.value === Locale.RU ? Locale.EN : Locale.RU
 }
 </script>
 

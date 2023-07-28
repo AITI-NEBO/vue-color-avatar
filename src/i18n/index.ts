@@ -3,13 +3,13 @@ import { createI18n } from 'vue-i18n'
 import { Locale } from '@/enums'
 
 import en from './locales/en'
-import zh from './locales/zh'
+import ru from './locales/ru'
 
-const messages = { en, zh }
+const messages = { en, ru }
 
 const [locale, fallbackLocale] = /^zh\b/.test(window.navigator.language)
-  ? [Locale.ZH, Locale.EN]
-  : [Locale.EN, Locale.ZH]
+  ? [Locale.RU, Locale.EN]
+  : [Locale.EN, Locale.RU]
 
 export default createI18n({
   locale,
