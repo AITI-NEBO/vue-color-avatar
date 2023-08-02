@@ -72,6 +72,9 @@
             <div v-if="errorMessage" style="color: #ff4757; margin-top: 20px">
               {{ errorMessage }}
             </div>
+            <div v-if="successMessage" style="color: #c3e88d; margin-top: 20px">
+              {{ successMessage }}
+            </div>
             <p v-show="store.$state.isAD" style="margin-top: 15px">
               Генерация доступна в расширенной версии
             </p>
@@ -154,6 +157,7 @@ const [avatarOption, setAvatarOption] = useAvatarOption()
 
 const { t } = useI18n()
 let errorMessage = ref('')
+let successMessage = ref('')
 
 const colorAvatarRef = ref<VueColorAvatarRef>()
 
@@ -281,7 +285,12 @@ async function handleSetAvatar() {
               `${dataURL}`.split('base64,')[1],
             ],
           }
-          bitrix.call('user.update', userData).catch((error) => {
+          bitrix.call('user.update', userData).then((response)=>{
+            console.log(response)
+            if (response.result) {
+              successMessage.value='Аватар успешно установлен!'
+            }
+          }).catch((error) => {
             errorMessage.value = 'Ошибка при обновлении аватара пользователя'
           })
         })
