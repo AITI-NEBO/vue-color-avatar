@@ -13,6 +13,7 @@ export default {
     copyCode: 'Copy',
     copied: 'Copied',
     downloading: 'Downloading',
+    setAvatarLoad:'Installation',
     close: 'Close',
   },
   label: {

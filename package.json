@@ -8,7 +8,7 @@
     "build": "npm run test && vite build",
     "build:prerelease": "vite build --mode prerelease",
     "deps": "yarn upgrade-interactive --latest",
-    "dev": "vite",
+    "dev": "vite --host",
     "lint": "yarn lint:es && yarn lint:style && yarn lint:ts",
     "lint:es": "eslint \"src/**/*.{js,jsx,ts,tsx,vue}\"",
     "lint:prettier": "prettier --write \"src/**/*.{md,json,html}\"",
@@ -19,6 +19,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@sknebo/ad-integrator": "github:sknebo/ad-integrator",
     "@sknebo/bitrix-js": "github:sknebo/bitrix-js",
     "canvas-confetti": "^1.4.0",
     "clipboard": "^2.0.8",

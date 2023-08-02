@@ -30,7 +30,11 @@
 <script lang="ts" setup>
 import IconGitHub from '@/assets/icons/icon-github.svg'
 import Logo from '@/components/Logo.vue'
+import { useStore } from '@/store'
 import { recordEvent } from '@/utils/ga'
+
+const store = useStore()
+console.log(store.$state.isAD)
 </script>
 
 <style lang="scss" scoped>

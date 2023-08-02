@@ -5,8 +5,8 @@ import BitrixJS, {
 
 
 const config = {
-  client_id: 'local.64a3e25b4d43b0.25135085',
-  client_secret: '3UJ4qwzF6AdQ8hfSP2ntdgg9p0IU1AZJk2b4xACtpXeX0cnM6l',
+  client_id: 'local.64ca010ae561b6.16258914',
+  client_secret: 'OSkh5S44jYNf3ISBiEw9pi0DWXLubbN7sBZ3Ds6rmkarsAAj0k',
 }
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)

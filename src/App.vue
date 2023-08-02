@@ -18,12 +18,19 @@
             </div>
 
             <ActionBar @action="handleAction" />
+            <div
+              class="ad"
+              data-type="banner"
+              data-width="100%"
+              data-orientation="horizontal"
+            ></div>
 
             <div class="action-group">
               <button
                 type="button"
                 class="action-btn action-randomize"
-                @click="handleGenerate"
+                :disabled="store.$state.isAD"
+                @click="store.$state.isAD ? '' : handleGenerate"
               >
                 {{ t('action.randomize') }}
               </button>
@@ -44,18 +51,30 @@
               <button
                 type="button"
                 class="action-btn action-multiple"
-                @click="() => generateMultiple()"
+                :disabled="store.$state.isAD"
+                @click="() => (store.$state.isAD ? '' : generateMultiple)"
               >
                 {{ t('action.downloadMultiple') }}
               </button>
+
               <button
                 type="button"
                 class="action-btn action-multiple"
                 @click="() => handleSetAvatar()"
               >
-                {{ t('action.setAvatar') }}
+                {{
+                  setAvatar
+                    ? `${t('action.setAvatarLoad')}...`
+                    : t('action.setAvatar')
+                }}
               </button>
             </div>
+            <div v-if="errorMessage" style="color: #ff4757; margin-top: 20px">
+              {{ errorMessage }}
+            </div>
+            <p v-show="store.$state.isAD" style="margin-top: 15px">
+              Генерация доступна в расширенной версии
+            </p>
           </div>
 
           <Footer />
@@ -93,7 +112,7 @@
 
 <script lang="ts" setup>
 import type { Method } from '@sknebo/bitrix-js'
-import { ref, watchEffect } from 'vue'
+import { onBeforeMount, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ActionBar from '@/components/ActionBar.vue'
@@ -111,7 +130,7 @@ import Footer from '@/layouts/Footer.vue'
 import Header from '@/layouts/Header.vue'
 import Sider from '@/layouts/Sider.vue'
 import { useStore } from '@/store'
-import { REDO, UNDO } from '@/store/mutation-type'
+import { REDO, SET_AD, UNDO } from '@/store/mutation-type'
 import {
   getRandomAvatarOption,
   getSpecialAvatarOption,
@@ -134,6 +153,7 @@ const store = useStore()
 const [avatarOption, setAvatarOption] = useAvatarOption()
 
 const { t } = useI18n()
+let errorMessage = ref('')
 
 const colorAvatarRef = ref<VueColorAvatarRef>()
 
@@ -160,6 +180,8 @@ function handleGenerate() {
 
 const downloadModalVisible = ref(false)
 const downloading = ref(false)
+const setAvatar = ref(false)
+
 const imageDataURL = ref('')
 
 async function handleDownload() {
@@ -178,7 +200,7 @@ async function handleDownload() {
         backgroundColor: null,
       })
       const dataURL = canvas.toDataURL()
-      console.log(dataURL)
+
       if (notCompatible) {
         imageDataURL.value = dataURL
         downloadModalVisible.value = true
@@ -199,9 +221,19 @@ async function handleDownload() {
     }, DOWNLOAD_DELAY)
   }
 }
+onBeforeMount(async () => {
+  await bitrix.call('app.info' as Method, {}).then((response: any) => {
+    if (response.result.STATUS === 'L') {
+      store[SET_AD](true)
+    }
+    if (response.result.STATUS === 'F') {
+      store[SET_AD](true)
+    }
+  })
+})
 async function handleSetAvatar() {
   try {
-    downloading.value = true
+    setAvatar.value = true
     const avatarEle = colorAvatarRef.value?.avatarRef
 
     const userAgent = window.navigator.userAgent.toLowerCase()
@@ -214,69 +246,24 @@ async function handleSetAvatar() {
       const canvas = await html2canvas(avatarEle, {
         backgroundColor: null,
       })
-      console.log(canvas)
 
       const dataURL = canvas.toDataURL('image/png')
-      var formData = new FormData();
-      var dataBlob = new Blob([dataURL], { type: 'image/png' });
-
-      const imageFile = new File([dataBlob], 'image.png', { type: 'image/png' });
-
 
       if (notCompatible) {
         imageDataURL.value = dataURL
         downloadModalVisible.value = true
       } else {
-
         bitrix.call('profile' as Method, {}).then((response: any) => {
-          console.log(response)
-
-          bitrix
-            .call('disk.storage.getforapp' as Method, {})
-            .then((responseDisk: any) => {
-              console.log(responseDisk)
-              bitrix
-                .call('disk.storage.uploadfile' as Method, {
-                  id: responseDisk.result.ID,
-                  data: {
-                    NAME: `${appName}.png`,
-                  },
-                  fileContent: [appName, `${dataURL}`.split('base64,')[1]],
-                  generateUniqueName: true,
-                })
-                .then((uploadUrl: any) => {
-                  const dataURL = canvas.toDataURL('image/png')
-                  var dataBlob = new Blob([dataURL], { type: 'image/png' });
-
-                  const imageFile = new File([dataBlob], 'image.png', { type: 'image/png' });
-                  console.log(imageFile)
-
-                  const userData = {
-                    ID: response.result.ID,
-
-                    PERSONAL_PHOTO: uploadUrl,
-
-
-                  }
-                  bitrix
-                    .call('user.update', userData)
-                    .then((result) => {
-                      console.log(
-                        'Аватар пользователя успешно обновлен:',
-                        result
-                      )
-                      bitrix.call('user.current').then((current)=>{
-                        console.log(current)
-                      })
-                    })
-                    .catch((error) => {
-                      console.error(
-                        'Ошибка при обновлении аватара пользователя:',
-                        error
-                      )
-                    })
-                })
-            })
+          const userData = {
+            ID: response.result.ID,
+            PERSONAL_PHOTO: [
+              `${appName}.png`,
+              `${dataURL}`.split('base64,')[1],
+            ],
+          }
+          bitrix.call('user.update', userData).catch((error) => {
+            errorMessage.value = 'Ошибка при обновлении аватара пользователя'
+          })
         })
 
         recordEvent('click_download', {
@@ -286,7 +273,7 @@ async function handleSetAvatar() {
     }
   } finally {
     setTimeout(() => {
-      downloading.value = false
+      setAvatar.value = false
     }, DOWNLOAD_DELAY)
   }
 }
@@ -416,7 +403,7 @@ async function generateMultiple(count = 5 * 6) {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 4rem;
+    margin-top: 1rem;
     column-gap: 1rem;
 
     @supports not (column-gap: 1rem) {

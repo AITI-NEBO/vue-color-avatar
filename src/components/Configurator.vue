@@ -16,6 +16,11 @@
                 wrapperShape,
                 { active: wrapperShape === avatarOption.wrapperShape },
               ]"
+              :style="
+                store.$state.isAD && wrapperShape === 'squircle'
+                  ? { opacity: 0.3 }
+                  : {}
+              "
             />
           </li>
         </ul>
@@ -30,6 +35,7 @@
             @click="switchBgColor(bgColor)"
           >
             <div
+              v-if="bgColor[0] === '#'"
               :style="{ background: bgColor }"
               class="bg-color"
               :class="{
@@ -37,7 +43,26 @@
                 transparent: bgColor === 'transparent',
               }"
             ></div>
+            <div
+              v-if="bgColor[0] !== '#'"
+              disabled="true"
+              :style="
+                store.$state.isAD
+                  ? { background: bgColor, opacity: 0.3 }
+                  : { background: bgColor }
+              "
+              class="bg-color"
+              :class="{
+                active: bgColor === avatarOption.background.color,
+                transparent: bgColor === 'transparent',
+              }"
+            ></div>
           </li>
+          <span
+            v-if="store.$state.isAD"
+            style="margin-top: 10px; font-size: 14px"
+            >Градиент доступен в расширенной версии
+          </span>
         </ul>
       </SectionWrapper>
 
@@ -107,11 +132,12 @@ import {
   WidgetType,
 } from '@/enums'
 import { useAvatarOption } from '@/hooks'
+import { useStore } from '@/store'
 import { AVATAR_LAYER, SETTINGS } from '@/utils/constant'
 import { previewData } from '@/utils/dynamic-data'
 
 const { t } = useI18n()
-
+const store = useStore()
 const [avatarOption, setAvatarOption] = useAvatarOption()
 
 const sectionList = reactive(Object.values(WidgetType))
@@ -168,13 +194,16 @@ async function getWidgets(widgetType: WidgetType) {
 }
 
 function switchWrapperShape(wrapperShape: WrapperShape) {
-  if (wrapperShape !== avatarOption.value.wrapperShape) {
+  if (wrapperShape !== avatarOption.value.wrapperShape && (wrapperShape!== 'squircle' || !store.$state.isAD)) {
     setAvatarOption({ ...avatarOption.value, wrapperShape })
   }
 }
 
 function switchBgColor(bgColor: string) {
-  if (bgColor !== avatarOption.value.background.color) {
+  if (
+    bgColor !== avatarOption.value.background.color &&
+    (!store.$state.isAD || !(bgColor[0] === 'l'))
+  ) {
     setAvatarOption({
       ...avatarOption.value,
       background: { ...avatarOption.value.background, color: bgColor },
@@ -225,6 +254,11 @@ function getWidgetColor(type: string) {
   } else return ''
 }
 </script>
+<style>
+.banner {
+  object-fit: none;
+}
+</style>
 
 <style lang="scss" scoped>
 @use 'src/styles/var';

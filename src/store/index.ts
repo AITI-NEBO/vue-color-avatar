@@ -6,7 +6,7 @@ import { getRandomAvatarOption } from '@/utils'
 import { SCREEN } from '@/utils/constant'
 
 import {
-  REDO,
+  REDO, SET_AD,
   SET_AVATAR_OPTION,
   SET_SIDER_STATUS,
   UNDO,
@@ -18,7 +18,8 @@ export interface State {
     present: AvatarOption
     future: AvatarOption[]
   }
-  isSiderCollapsed: boolean
+  isSiderCollapsed: boolean,
+  isAD: boolean
 }
 
 export const useStore = defineStore('store', {
@@ -30,6 +31,7 @@ export const useStore = defineStore('store', {
         future: [],
       },
       isSiderCollapsed: window.innerWidth <= SCREEN.lg,
+      isAD: false,
     } as State),
   actions: {
     [SET_AVATAR_OPTION](data: AvatarOption) {
@@ -38,6 +40,10 @@ export const useStore = defineStore('store', {
         present: data,
         future: [],
       }
+    },
+    [SET_AD](data) {
+      this.isAD = data
+
     },
 
     [UNDO]() {

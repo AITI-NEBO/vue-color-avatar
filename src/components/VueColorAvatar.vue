@@ -30,6 +30,7 @@ import { AVATAR_LAYER, NONE } from '@/utils/constant'
 import { widgetData } from '@/utils/dynamic-data'
 
 import Background from './widgets/Background.vue'
+import {useStore} from "@/store";
 
 interface VueColorAvatarProps {
   option: AvatarOption
@@ -42,6 +43,7 @@ const props = withDefaults(defineProps<VueColorAvatarProps>(), {
 })
 
 const { option: avatarOption, size: avatarSize } = toRefs(props)
+const store = useStore()
 
 const avatarRef = ref<VueColorAvatarRef['avatarRef']>()
 
@@ -54,7 +56,7 @@ function getWrapperShapeClassName() {
     [WrapperShape.Square]:
       avatarOption.value.wrapperShape === WrapperShape.Square,
     [WrapperShape.Squircle]:
-      avatarOption.value.wrapperShape === WrapperShape.Squircle,
+      avatarOption.value.wrapperShape === WrapperShape.Squircle ,
   }
 }
 

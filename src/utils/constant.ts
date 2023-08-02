@@ -72,6 +72,8 @@ export const SETTINGS: Readonly<AvatarSettings> = {
   clothesShape: Object.values(ClothesShape),
 
   commonColors: [
+    '#000000',
+    '#654321',
     '#6BD9E9',
     '#FC909F',
     '#F4D150',
