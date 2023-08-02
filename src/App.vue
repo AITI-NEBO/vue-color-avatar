@@ -18,12 +18,14 @@
             </div>
 
             <ActionBar @action="handleAction" />
-            <div
-              class="ad"
-              data-type="banner"
-              data-width="100%"
-              data-orientation="horizontal"
-            ></div>
+            <div v-show="store.$state.isAD">
+              <div
+                class="ad"
+                data-type="banner"
+                data-width="100%"
+                data-orientation="horizontal"
+              ></div>
+            </div>
 
             <div class="action-group">
               <button
@@ -115,7 +117,7 @@
 
 <script lang="ts" setup>
 import type { Method } from '@sknebo/bitrix-js'
-import {computed, onBeforeMount, ref, watchEffect} from 'vue'
+import { computed, onBeforeMount, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ActionBar from '@/components/ActionBar.vue'
@@ -225,22 +227,30 @@ async function handleDownload() {
     }, DOWNLOAD_DELAY)
   }
 }
-const fixWindow = () =>{
+const fixWindow = () => {
   try {
-    const q = window.name.split("|");
-    const domain = q[0].replace(/:(80|443)$/, "");
-    const protocol = parseInt(q[1]) && true || false;
-    const app_sid = q[2];
-    parent.postMessage("resizeWindow:" + JSON.stringify({
-      "width": "100%",
-      "height": Math.max(document.documentElement.scrollHeight, document.documentElement.offsetHeight)
-    }) + "::" + app_sid, "http" + (protocol ? "s" : "") + "://" + domain);
-  }
-  catch (e) {
-    console.error("resizeWindow", e);
+    const q = window.name.split('|')
+    const domain = q[0].replace(/:(80|443)$/, '')
+    const protocol = (parseInt(q[1]) && true) || false
+    const app_sid = q[2]
+    parent.postMessage(
+      'resizeWindow:' +
+        JSON.stringify({
+          width: '100%',
+          height: Math.max(
+            document.documentElement.scrollHeight,
+            document.documentElement.offsetHeight
+          ),
+        }) +
+        '::' +
+        app_sid,
+      'http' + (protocol ? 's' : '') + '://' + domain
+    )
+  } catch (e) {
+    console.error('resizeWindow', e)
   }
 }
-const inFrame = computed(()=>!!window.name);
+const inFrame = computed(() => !!window.name)
 
 onBeforeMount(async () => {
   await bitrix.call('app.info' as Method, {}).then((response: any) => {
@@ -251,8 +261,8 @@ onBeforeMount(async () => {
       store[SET_AD](true)
     }
   })
-  if(inFrame.value) {
-    setInterval(fixWindow, 500);
+  if (inFrame.value) {
+    setInterval(fixWindow, 500)
   }
 })
 async function handleSetAvatar() {
@@ -285,14 +295,17 @@ async function handleSetAvatar() {
               `${dataURL}`.split('base64,')[1],
             ],
           }
-          bitrix.call('user.update', userData).then((response)=>{
-            console.log(response)
-            if (response.result) {
-              successMessage.value='Аватар успешно установлен!'
-            }
-          }).catch((error) => {
-            errorMessage.value = 'Ошибка при обновлении аватара пользователя'
-          })
+          bitrix
+            .call('user.update', userData)
+            .then((response) => {
+              console.log(response)
+              if (response.result) {
+                successMessage.value = 'Аватар успешно установлен!'
+              }
+            })
+            .catch((error) => {
+              errorMessage.value = 'Ошибка при обновлении аватара пользователя'
+            })
         })
 
         recordEvent('click_download', {
