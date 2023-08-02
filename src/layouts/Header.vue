@@ -2,7 +2,7 @@
   <header class="header">
     <Logo />
 
-    <h2 class="site-title">Аватар 24</h2>
+    <h2 class="site-title">Аватар24</h2>
 
     <div class="header-right">
       <a
