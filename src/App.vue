@@ -18,7 +18,7 @@
             </div>
 
             <ActionBar @action="handleAction" />
-            <div v-show="store.$state.isAD">
+            <div v-show="store.$state.isAD" style="margin-top: 15px">
               <div
                 class="ad"
                 data-type="banner"
