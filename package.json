@@ -8,7 +8,7 @@
     "build": "npm run test && vite build",
     "build:prerelease": "vite build --mode prerelease",
     "deps": "yarn upgrade-interactive --latest",
-    "dev": "vite --host",
+    "dev": "vite",
     "lint": "yarn lint:es && yarn lint:style && yarn lint:ts",
     "lint:es": "eslint \"src/**/*.{js,jsx,ts,tsx,vue}\"",
     "lint:prettier": "prettier --write \"src/**/*.{md,json,html}\"",
@@ -16,7 +16,8 @@
     "lint:ts": "tsc --noEmit --skipLibCheck",
     "prepare": "husky install",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest",
+    "install-private-repo": "npm install git+https://${GH_TOKEN}@github.com/sknebo/bitrix-js && npm install"
   },
   "dependencies": {
     "@sknebo/ad-integrator": "github:sknebo/ad-integrator",
