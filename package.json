@@ -20,7 +20,6 @@
     "install-private-repo": "npm install git+https://${GH_TOKEN}@github.com/sknebo/bitrix-js && npm install"
   },
   "dependencies": {
-    "@sknebo/ad-integrator": "github:sknebo/ad-integrator",
     "@sknebo/bitrix-js": "github:sknebo/bitrix-js",
     "canvas-confetti": "^1.4.0",
     "clipboard": "^2.0.8",
