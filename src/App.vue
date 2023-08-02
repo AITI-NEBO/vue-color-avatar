@@ -32,7 +32,7 @@
                 type="button"
                 class="action-btn action-randomize"
                 :disabled="store.$state.isAD"
-                @click="store.$state.isAD ? '' : handleGenerate"
+                @click="store.$state.isAD ? '' : handleGenerate()"
               >
                 {{ t('action.randomize') }}
               </button>
@@ -54,7 +54,7 @@
                 type="button"
                 class="action-btn action-multiple"
                 :disabled="store.$state.isAD"
-                @click="() => (store.$state.isAD ? '' : generateMultiple)"
+                @click="() => (store.$state.isAD ? '' : generateMultiple())"
               >
                 {{ t('action.downloadMultiple') }}
               </button>
@@ -255,7 +255,7 @@ const inFrame = computed(() => !!window.name)
 onBeforeMount(async () => {
   await bitrix.call('app.info' as Method, {}).then((response: any) => {
     if (response.result.STATUS === 'L') {
-      store[SET_AD](true)
+      store[SET_AD](false)
     }
     if (response.result.STATUS === 'F') {
       store[SET_AD](true)
