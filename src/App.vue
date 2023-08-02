@@ -71,10 +71,10 @@
                 }}
               </button>
             </div>
-            <div v-if="errorMessage" style="color: #ff4757; margin-top: 20px">
+            <div v-if="errorMessage" style="color: #ff4757;position: relative; top: 20px;margin-bottom: 15px">
               {{ errorMessage }}
             </div>
-            <div v-if="successMessage" style="color: #c3e88d; margin-top: 20px">
+            <div v-if="successMessage" style="color: #c3e88d;position: relative; top: 20px;margin-bottom: 15px">
               {{ successMessage }}
             </div>
             <p v-show="store.$state.isAD" style="margin-top: 15px">
