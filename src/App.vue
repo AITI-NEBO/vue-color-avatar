@@ -301,10 +301,12 @@ async function handleSetAvatar() {
               console.log(response)
               if (response.result) {
                 successMessage.value = 'Аватар успешно установлен!'
+                setAvatar.value = false
               }
             })
             .catch((error) => {
               errorMessage.value = 'Ошибка при обновлении аватара пользователя'
+              setAvatar.value = false
             })
         })
 
@@ -314,9 +316,6 @@ async function handleSetAvatar() {
       }
     }
   } finally {
-    setTimeout(() => {
-      setAvatar.value = false
-    }, DOWNLOAD_DELAY)
   }
 }
 
