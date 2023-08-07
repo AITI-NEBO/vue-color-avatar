@@ -317,14 +317,14 @@ async function handleSetAvatar() {
             ],
           }
           bitrix
-            .call('user.update', userData)
-            .then((response) => {
+            .call('user.update' as Method, userData)
+            .then((response: any) => {
               if (response.result) {
                 successMessage.value = 'Аватар успешно установлен!'
                 setAvatar.value = false
               }
             })
-            .catch((error) => {
+            .catch(() => {
               errorMessage.value = 'Ошибка при обновлении аватара пользователя'
               setAvatar.value = false
             })
