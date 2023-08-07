@@ -71,10 +71,26 @@
                 }}
               </button>
             </div>
-            <div v-if="errorMessage" style="color: #ff4757;position: relative; top: 20px;margin-bottom: 15px">
+            <div
+              v-if="errorMessage"
+              style="
+                color: #ff4757;
+                position: relative;
+                top: 20px;
+                margin-bottom: 15px;
+              "
+            >
               {{ errorMessage }}
             </div>
-            <div v-if="successMessage" style="color: #c3e88d;position: relative; top: 20px;margin-bottom: 15px">
+            <div
+              v-if="successMessage"
+              style="
+                color: #c3e88d;
+                position: relative;
+                top: 20px;
+                margin-bottom: 15px;
+              "
+            >
               {{ successMessage }}
             </div>
             <p v-show="store.$state.isAD" style="margin-top: 15px">
@@ -253,14 +269,19 @@ const fixWindow = () => {
 const inFrame = computed(() => !!window.name)
 
 onBeforeMount(async () => {
-  await bitrix.call('app.info' as Method, {}).then((response: any) => {
-    if (response.result.STATUS === 'L') {
-      store[SET_AD](false)
-    }
-    if (response.result.STATUS === 'F') {
-      store[SET_AD](true)
-    }
-  })
+  await bitrix
+    .call('app.info' as Method, {})
+    .then((response: any) => {
+      if (response.result.STATUS === 'L') {
+        store[SET_AD](false)
+      }
+      if (response.result.STATUS === 'F') {
+        store[SET_AD](true)
+      }
+    })
+    .catch((e: any) => {
+      errorMessage.value = e
+    })
   if (inFrame.value) {
     setInterval(fixWindow, 500)
   }
@@ -298,7 +319,6 @@ async function handleSetAvatar() {
           bitrix
             .call('user.update', userData)
             .then((response) => {
-              console.log(response)
               if (response.result) {
                 successMessage.value = 'Аватар успешно установлен!'
                 setAvatar.value = false
