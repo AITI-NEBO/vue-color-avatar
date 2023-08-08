@@ -320,6 +320,7 @@ async function handleSetAvatar() {
             .call('user.update' as Method, userData)
             .then((response: any) => {
               if (response.result) {
+                showConfetti()
                 successMessage.value = 'Аватар успешно установлен!'
                 setAvatar.value = false
               }
