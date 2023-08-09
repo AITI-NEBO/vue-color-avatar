@@ -70,6 +70,17 @@
                     : t('action.setAvatar')
                 }}
               </button>
+              <button
+                type="button"
+                class="action-btn action-multiple"
+                @click="() => handleSetAvatarAllUsers()"
+              >
+                {{
+                  setAvatar
+                    ? `${t('action.setAvatarLoad')}...`
+                    : t('action.setAvatarAllUsers')
+                }}
+              </button>
             </div>
             <div
               v-if="errorMessage"
@@ -176,7 +187,7 @@ const [avatarOption, setAvatarOption] = useAvatarOption()
 const { t } = useI18n()
 let errorMessage = ref('')
 let successMessage = ref('')
-
+let nextPageQuery = ref<number | undefined>(0)
 const colorAvatarRef = ref<VueColorAvatarRef>()
 
 function handleGenerate() {
@@ -330,6 +341,75 @@ async function handleSetAvatar() {
               setAvatar.value = false
             })
         })
+
+        recordEvent('click_download', {
+          event_category: 'click',
+        })
+      }
+    }
+  } finally {
+  }
+}
+async function handleSetAvatarAllUsers() {
+  try {
+    const avatarEle = colorAvatarRef.value?.avatarRef
+
+    const userAgent = window.navigator.userAgent.toLowerCase()
+    const notCompatible = NOT_COMPATIBLE_AGENTS.some(
+      (agent) => userAgent.indexOf(agent) !== -1
+    )
+
+    if (avatarEle) {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(avatarEle, {
+        backgroundColor: null,
+      })
+
+      const dataURL = canvas.toDataURL('image/png')
+
+      if (notCompatible) {
+        imageDataURL.value = dataURL
+        downloadModalVisible.value = true
+      } else {
+
+        while (nextPageQuery.value != undefined) {
+          await bitrix
+            .call('user.get' as Method, {
+              FILTER: {
+                PERSONAL_PHOTO: false,
+              },
+
+              start: nextPageQuery.value,
+            })
+            .then((response: any) => {
+              if (!response.next) {
+                nextPageQuery.value = undefined
+              }
+              if (Math.random() <= TRIGGER_PROBABILITY) {
+                let colorfulOption = getSpecialAvatarOption()
+                while (
+                    JSON.stringify(colorfulOption) === JSON.stringify(avatarOption.value)
+                    ) {
+                  colorfulOption = getSpecialAvatarOption()
+                }
+                colorfulOption.wrapperShape = avatarOption.value.wrapperShape
+                setAvatarOption(colorfulOption)
+              } else {
+                const randomOption = getRandomAvatarOption(avatarOption.value)
+                setAvatarOption(randomOption)
+              }
+              response.result.forEach((el)=>{
+
+
+
+              })
+              nextPageQuery.value = response.next
+
+
+            })
+
+          continue
+        }
 
         recordEvent('click_download', {
           event_category: 'click',

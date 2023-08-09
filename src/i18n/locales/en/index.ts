@@ -10,6 +10,7 @@ export default {
     download: 'Скачать',
     downloadMultiple: 'Сгенерировать много',
     setAvatar: 'Установить аватар в Битрикс24',
+    setAvatarAllUsers: 'Установка аватара всем пользователей Битрикс24',
     setAvatarLoad: 'Установка',
     copyCode: 'Скопировать',
     copied: 'Скопировано',

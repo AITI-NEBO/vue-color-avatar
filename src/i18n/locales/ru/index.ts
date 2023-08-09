@@ -10,10 +10,11 @@ export default {
     download: 'Download',
     downloadMultiple: 'Generate multiple',
     setAvatar: 'Set an avatar in Bitrix24',
+    setAvatarAllUsers: 'Installing an avatar for all Bitrix24 users',
     copyCode: 'Copy',
     copied: 'Copied',
     downloading: 'Downloading',
-    setAvatarLoad:'Installation',
+    setAvatarLoad: 'Installation',
     close: 'Close',
   },
   label: {

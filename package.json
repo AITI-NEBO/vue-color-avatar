@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@sknebo/bitrix-js": "github:sknebo/bitrix-js",
-    "canvas-confetti": "^1.4.0",
+    "canvas-confetti": "^1.6.0",
     "clipboard": "^2.0.8",
     "html2canvas": "^1.3.2",
     "jszip": "^3.10.0",

@@ -153,10 +153,9 @@ export function showConfetti() {
     if (!canvasEle) {
       return
     }
-
     const myConfetti = confetti.create(canvasEle, {
       resize: true,
-      useWorker: true,
+      useWorker: false,
       disableForReducedMotion: true,
     })
 
