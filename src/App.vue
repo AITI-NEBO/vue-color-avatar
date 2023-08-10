@@ -15,6 +15,12 @@
                   transform: `rotateY(${flipped ? -180 : 0}deg)`,
                 }"
               />
+              <div
+                v-if="countArrayUser && countUser && setAvatarUsers"
+                class="avatar-counter"
+              >
+                {{ countUser }}/{{ countArrayUser }} пользователей
+              </div>
             </div>
 
             <ActionBar @action="handleAction" />
@@ -70,17 +76,27 @@
                     : t('action.setAvatar')
                 }}
               </button>
+
               <button
                 type="button"
                 class="action-btn action-multiple"
-                @click="() => handleSetAvatarAllUsers()"
+                @click="accessModal = true"
               >
                 {{
-                  setAvatar
+                  setAvatarUsers
                     ? `${t('action.setAvatarLoad')}...`
                     : t('action.setAvatarAllUsers')
                 }}
               </button>
+              <button
+                v-if="setAvatarUsers"
+                type="button"
+                class="action-btn action-multiple action-btn--red"
+                @click="breakButton = !breakButton"
+              >
+                Отмена
+              </button>
+
             </div>
             <div
               v-if="errorMessage"
@@ -135,6 +151,11 @@
       @regenerate="generateMultiple"
       @close=";(avatarListVisible = false), (avatarList = [])"
     />
+    <ModalAccess
+      :visible="accessModal"
+      @click="handleSetAvatarAllUsers"
+      @close="accessModal = false"
+    />
 
     <Sider>
       <Configurator />
@@ -152,6 +173,8 @@ import Configurator from '@/components/Configurator.vue'
 import BatchDownloadModal from '@/components/Modal/BatchDownloadModal.vue'
 import CodeModal from '@/components/Modal/CodeModal.vue'
 import DownloadModal from '@/components/Modal/DownloadModal.vue'
+import ModalAccess from '@/components/Modal/ModalAccess.vue'
+import ModalWrapper from '@/components/Modal/ModalWrapper.vue'
 import VueColorAvatar, {
   type VueColorAvatarRef,
 } from '@/components/VueColorAvatar.vue'
@@ -189,6 +212,9 @@ let errorMessage = ref('')
 let successMessage = ref('')
 let nextPageQuery = ref<number | undefined>(0)
 const colorAvatarRef = ref<VueColorAvatarRef>()
+let countUser = ref(0)
+let countArrayUser = ref(0)
+let accessModal = ref(false)
 
 function handleGenerate() {
   if (Math.random() <= TRIGGER_PROBABILITY) {
@@ -214,6 +240,8 @@ function handleGenerate() {
 const downloadModalVisible = ref(false)
 const downloading = ref(false)
 const setAvatar = ref(false)
+let setAvatarUsers = ref(false)
+let breakButton = ref(false)
 
 const imageDataURL = ref('')
 
@@ -254,7 +282,6 @@ async function handleDownload() {
     }, DOWNLOAD_DELAY)
   }
 }
-
 const fixWindow = () => {
   try {
     const q = window.name.split('|')
@@ -298,7 +325,6 @@ onBeforeMount(async () => {
     setInterval(fixWindow, 500)
   }
 })
-
 async function handleSetAvatar() {
   try {
     setAvatar.value = true
@@ -355,78 +381,108 @@ async function handleSetAvatar() {
 
 async function handleSetAvatarAllUsers() {
   try {
-    while (nextPageQuery.value != undefined) {
-      await bitrix
-        .call('user.get' as Method, {
-          FILTER: {
-            PERSONAL_PHOTO: false,
-          },
+    nextPageQuery.value = 0
+    setAvatarUsers.value = true
+    accessModal.value = false
+    countUser.value = 0
+    breakButton.value = false
 
-          start: nextPageQuery.value,
-        })
-        .then(async (response: any) => {
-          if (!response.next) {
-            nextPageQuery.value = undefined
+    await bitrix
+      .call('user.admin' as Method, {})
+      .then(async (responseAdmin: any) => {
+        if (!responseAdmin.result) {
+          return (errorMessage.value = 'Нет прав для установки аватарок')
+        }
+        while (nextPageQuery.value != undefined && !breakButton.value) {
+          if (breakButton.value) {
+            setAvatarUsers.value = false
+            breakButton.value = false
+            break
           }
-          nextPageQuery.value = response.next
-          console.log(response.total)
-          generateMultiple()
-          // for (const el of response.result) {
-          //   if (Math.random() <= TRIGGER_PROBABILITY) {
-          //     let colorfulOption = getSpecialAvatarOption()
-          //     while (
-          //       JSON.stringify(colorfulOption) ===
-          //       JSON.stringify(avatarOption.value)
-          //     ) {
-          //       colorfulOption = getSpecialAvatarOption()
-          //     }
-          //     colorfulOption.wrapperShape = avatarOption.value.wrapperShape
-          //     setAvatarOption(colorfulOption)
-          //   } else {
-          //     const randomOption = getRandomAvatarOption(avatarOption.value)
-          //     setAvatarOption(randomOption)
-          //   }
-          //   const avatarEle = colorAvatarRef.value?.avatarRef
-          //
-          //   const userAgent = window.navigator.userAgent.toLowerCase()
-          //   const notCompatible = NOT_COMPATIBLE_AGENTS.some(
-          //     (agent) => userAgent.indexOf(agent) !== -1
-          //   )
-          //   const html2canvas = (await import('html2canvas')).default
-          //   const canvas = await html2canvas(avatarEle, {
-          //     backgroundColor: null,
-          //   })
-          //
-          //   const dataURL = canvas.toDataURL('image/png')
-          //   if (notCompatible) {
-          //     imageDataURL.value = dataURL
-          //     downloadModalVisible.value = true
-          //   } else {
-          //     const userData = {
-          //       ID: el.ID,
-          //       PERSONAL_PHOTO: [
-          //         `${appName}.png`,
-          //         `${dataURL}`.split('base64,')[1],
-          //       ],
-          //     }
-          //     bitrix
-          //       .call('user.update' as Method, userData)
-          //       .then((response: any) => {})
-          //       .catch(() => {
-          //         errorMessage.value =
-          //           'Ошибка при обновлении аватара пользователя'
-          //         setAvatar.value = false
-          //         return
-          //       })
-          //   }
-          //
-          //
-          // }
+          await bitrix
+            .call('user.get' as Method, {
+              FILTER: {
+                PERSONAL_PHOTO: false,
+              },
 
+              start: nextPageQuery.value,
+            })
+            .then(async (response: any) => {
+              if (!response.next) {
+                nextPageQuery.value = undefined
+              }
+              nextPageQuery.value = response.next
 
-        })
-      continue
-    }
+              countArrayUser.value = response.total
+              for (let i = 0; i < response.result.length; i++) {
+                if (breakButton.value) {
+                  setAvatarUsers.value = false
+
+                  break
+                }
+                countUser.value++
+
+                if (Math.random() <= TRIGGER_PROBABILITY) {
+                  let colorfulOption = getSpecialAvatarOption()
+                  while (
+                    JSON.stringify(colorfulOption) ===
+                    JSON.stringify(avatarOption.value)
+                  ) {
+                    colorfulOption = getSpecialAvatarOption()
+                  }
+                  colorfulOption.wrapperShape = avatarOption.value.wrapperShape
+                  setAvatarOption(colorfulOption)
+                } else {
+                  const randomOption = getRandomAvatarOption(avatarOption.value)
+                  setAvatarOption(randomOption)
+                }
+                const avatarEle = colorAvatarRef.value?.avatarRef
+
+                const userAgent = window.navigator.userAgent.toLowerCase()
+                const notCompatible = NOT_COMPATIBLE_AGENTS.some(
+                  (agent) => userAgent.indexOf(agent) !== -1
+                )
+                const html2canvas = (await import('html2canvas')).default
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //@ts-ignore
+                const canvas = await html2canvas(avatarEle, {
+                  backgroundColor: null,
+                })
+
+                const dataURL = canvas.toDataURL('image/png')
+                if (notCompatible) {
+                  imageDataURL.value = dataURL
+                  downloadModalVisible.value = true
+                } else {
+                  const userData = {
+                    ID: response.result[i].ID,
+                    PERSONAL_PHOTO: [
+                      `${appName}.png`,
+                      `${dataURL}`.split('base64,')[1],
+                    ],
+                  }
+                  // bitrix
+                  //   .call('user.update' as Method, userData)
+                  //   .then((response: any) => {})
+                  //   .catch(() => {
+                  //     errorMessage.value =
+                  //       'Ошибка при обновлении аватара пользователя'
+                  //     setAvatar.value = false
+                  //     return
+                  //   })
+                }
+                if (response.total === countUser.value) {
+                  showConfetti()
+                  setAvatarUsers.value = false
+                }
+              }
+            })
+            .catch((e) => {
+              errorMessage.value = e
+            })
+          continue
+        }
+      })
   } finally {
   }
 }
@@ -533,7 +589,10 @@ async function generateMultiple(count = 5 * 6) {
     }
   }
 }
-
+.avatar-counter {
+  position: absolute;
+  bottom: -25px;
+}
 .playground {
   display: flex;
   flex: 1;
@@ -546,6 +605,7 @@ async function generateMultiple(count = 5 * 6) {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 
     @media screen and (max-width: var.$screen-sm) {
       transform: scale(0.85);
@@ -558,7 +618,7 @@ async function generateMultiple(count = 5 * 6) {
     justify-content: center;
     margin-top: 1rem;
     column-gap: 1rem;
-
+    flex-wrap: wrap;
     @supports not (column-gap: 1rem) {
       .action-btn {
         margin: 0 0.5rem;
@@ -576,9 +636,13 @@ async function generateMultiple(count = 5 * 6) {
       cursor: pointer;
       transition: color 0.2s;
       user-select: none;
+      margin-bottom: 20px;
 
       &:hover {
         color: lighten(var.$color-text, 10);
+      }
+      &--red {
+        background: rgba(173, 12, 26, 0.63);
       }
 
       &:disabled,

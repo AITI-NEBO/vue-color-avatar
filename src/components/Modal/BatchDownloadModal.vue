@@ -1,4 +1,5 @@
 <template>
+
   <ModalWrapper :visible="props.visible" @close="emit('close')">
     <div class="container">
       <div class="top-bar">

@@ -90,11 +90,11 @@ export enum NoseShape {
 }
 
 export enum MouthShape {
-  Frown = 'frown',
+
   Laughing = 'laughing',
   Nervous = 'nervous',
   Pucker = 'pucker',
-  Sad = 'sad',
+
   Smile = 'smile',
   Smirk = 'smirk',
   Surprised = 'surprised',
