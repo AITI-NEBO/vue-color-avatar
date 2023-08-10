@@ -461,15 +461,15 @@ async function handleSetAvatarAllUsers() {
                       `${dataURL}`.split('base64,')[1],
                     ],
                   }
-                  // bitrix
-                  //   .call('user.update' as Method, userData)
-                  //   .then((response: any) => {})
-                  //   .catch(() => {
-                  //     errorMessage.value =
-                  //       'Ошибка при обновлении аватара пользователя'
-                  //     setAvatar.value = false
-                  //     return
-                  //   })
+                  bitrix
+                    .call('user.update' as Method, userData)
+                    .then((response: any) => {})
+                    .catch(() => {
+                      errorMessage.value =
+                        'Ошибка при обновлении аватара пользователя'
+                      setAvatar.value = false
+                      return
+                    })
                 }
                 if (response.total === countUser.value) {
                   showConfetti()
