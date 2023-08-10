@@ -254,6 +254,7 @@ async function handleDownload() {
     }, DOWNLOAD_DELAY)
   }
 }
+
 const fixWindow = () => {
   try {
     const q = window.name.split('|')
@@ -297,6 +298,7 @@ onBeforeMount(async () => {
     setInterval(fixWindow, 500)
   }
 })
+
 async function handleSetAvatar() {
   try {
     setAvatar.value = true
@@ -350,71 +352,80 @@ async function handleSetAvatar() {
   } finally {
   }
 }
+
 async function handleSetAvatarAllUsers() {
   try {
-    const avatarEle = colorAvatarRef.value?.avatarRef
+    while (nextPageQuery.value != undefined) {
+      await bitrix
+        .call('user.get' as Method, {
+          FILTER: {
+            PERSONAL_PHOTO: false,
+          },
 
-    const userAgent = window.navigator.userAgent.toLowerCase()
-    const notCompatible = NOT_COMPATIBLE_AGENTS.some(
-      (agent) => userAgent.indexOf(agent) !== -1
-    )
-
-    if (avatarEle) {
-      const html2canvas = (await import('html2canvas')).default
-      const canvas = await html2canvas(avatarEle, {
-        backgroundColor: null,
-      })
-
-      const dataURL = canvas.toDataURL('image/png')
-
-      if (notCompatible) {
-        imageDataURL.value = dataURL
-        downloadModalVisible.value = true
-      } else {
-
-        while (nextPageQuery.value != undefined) {
-          await bitrix
-            .call('user.get' as Method, {
-              FILTER: {
-                PERSONAL_PHOTO: false,
-              },
-
-              start: nextPageQuery.value,
-            })
-            .then((response: any) => {
-              if (!response.next) {
-                nextPageQuery.value = undefined
-              }
-              if (Math.random() <= TRIGGER_PROBABILITY) {
-                let colorfulOption = getSpecialAvatarOption()
-                while (
-                    JSON.stringify(colorfulOption) === JSON.stringify(avatarOption.value)
-                    ) {
-                  colorfulOption = getSpecialAvatarOption()
-                }
-                colorfulOption.wrapperShape = avatarOption.value.wrapperShape
-                setAvatarOption(colorfulOption)
-              } else {
-                const randomOption = getRandomAvatarOption(avatarOption.value)
-                setAvatarOption(randomOption)
-              }
-              response.result.forEach((el)=>{
-
-
-
-              })
-              nextPageQuery.value = response.next
-
-
-            })
-
-          continue
-        }
-
-        recordEvent('click_download', {
-          event_category: 'click',
+          start: nextPageQuery.value,
         })
-      }
+        .then(async (response: any) => {
+          if (!response.next) {
+            nextPageQuery.value = undefined
+          }
+          nextPageQuery.value = response.next
+          console.log(response.total)
+          generateMultiple()
+          // for (const el of response.result) {
+          //   if (Math.random() <= TRIGGER_PROBABILITY) {
+          //     let colorfulOption = getSpecialAvatarOption()
+          //     while (
+          //       JSON.stringify(colorfulOption) ===
+          //       JSON.stringify(avatarOption.value)
+          //     ) {
+          //       colorfulOption = getSpecialAvatarOption()
+          //     }
+          //     colorfulOption.wrapperShape = avatarOption.value.wrapperShape
+          //     setAvatarOption(colorfulOption)
+          //   } else {
+          //     const randomOption = getRandomAvatarOption(avatarOption.value)
+          //     setAvatarOption(randomOption)
+          //   }
+          //   const avatarEle = colorAvatarRef.value?.avatarRef
+          //
+          //   const userAgent = window.navigator.userAgent.toLowerCase()
+          //   const notCompatible = NOT_COMPATIBLE_AGENTS.some(
+          //     (agent) => userAgent.indexOf(agent) !== -1
+          //   )
+          //   const html2canvas = (await import('html2canvas')).default
+          //   const canvas = await html2canvas(avatarEle, {
+          //     backgroundColor: null,
+          //   })
+          //
+          //   const dataURL = canvas.toDataURL('image/png')
+          //   if (notCompatible) {
+          //     imageDataURL.value = dataURL
+          //     downloadModalVisible.value = true
+          //   } else {
+          //     const userData = {
+          //       ID: el.ID,
+          //       PERSONAL_PHOTO: [
+          //         `${appName}.png`,
+          //         `${dataURL}`.split('base64,')[1],
+          //       ],
+          //     }
+          //     bitrix
+          //       .call('user.update' as Method, userData)
+          //       .then((response: any) => {})
+          //       .catch(() => {
+          //         errorMessage.value =
+          //           'Ошибка при обновлении аватара пользователя'
+          //         setAvatar.value = false
+          //         return
+          //       })
+          //   }
+          //
+          //
+          // }
+
+
+        })
+      continue
     }
   } finally {
   }
