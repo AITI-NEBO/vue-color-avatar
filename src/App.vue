@@ -160,6 +160,7 @@
     <Sider>
       <Configurator />
     </Sider>
+
   </main>
 </template>
 
@@ -284,10 +285,13 @@ async function handleDownload() {
 }
 const fixWindow = () => {
   try {
+
+
     const q = window.name.split('|')
     const domain = q[0].replace(/:(80|443)$/, '')
     const protocol = (parseInt(q[1]) && true) || false
     const app_sid = q[2]
+    console.log()
     parent.postMessage(
       'resizeWindow:' +
         JSON.stringify({
@@ -321,9 +325,11 @@ onBeforeMount(async () => {
     .catch((e: any) => {
       errorMessage.value = e
     })
+  console.log(inFrame.value)
   if (inFrame.value) {
-    setInterval(fixWindow, 500)
+    setInterval(fixWindow, 2000)
   }
+
 })
 async function handleSetAvatar() {
   try {
