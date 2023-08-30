@@ -323,8 +323,6 @@ onBeforeMount(async () => {
 })
 
 onMounted(() => {
-  fixWindow()
-  console.log(bitrix)
 })
 
 async function handleSetAvatar() {

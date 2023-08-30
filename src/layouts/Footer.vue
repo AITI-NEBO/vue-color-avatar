@@ -30,7 +30,6 @@ import { Locale } from '@/enums'
 const { locale } = useI18n()
 
 function switchLocale() {
-  console.log(locale.value)
   locale.value = locale.value === Locale.RU ? Locale.EN : Locale.RU
 }
 </script>
