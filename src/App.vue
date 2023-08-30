@@ -160,13 +160,12 @@
     <Sider>
       <Configurator />
     </Sider>
-
   </main>
 </template>
 
 <script lang="ts" setup>
 import type { Method } from '@sknebo/bitrix-js'
-import { computed, onBeforeMount, ref, watchEffect } from 'vue'
+import {computed, onBeforeMount, onMounted, ref, watchEffect} from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ActionBar from '@/components/ActionBar.vue'
@@ -216,6 +215,9 @@ const colorAvatarRef = ref<VueColorAvatarRef>()
 let countUser = ref(0)
 let countArrayUser = ref(0)
 let accessModal = ref(false)
+
+
+
 
 function handleGenerate() {
   if (Math.random() <= TRIGGER_PROBABILITY) {
@@ -283,28 +285,17 @@ async function handleDownload() {
     }, DOWNLOAD_DELAY)
   }
 }
-const fixWindow = () => {
+const fixWindow = async () => {
   try {
-
-
-    const q = window.name.split('|')
-    const domain = q[0].replace(/:(80|443)$/, '')
-    const protocol = (parseInt(q[1]) && true) || false
-    const app_sid = q[2]
-    console.log()
-    parent.postMessage(
-      'resizeWindow:' +
-        JSON.stringify({
-          width: '100%',
-          height: Math.max(
-            document.documentElement.scrollHeight,
-            document.documentElement.offsetHeight
-          ),
-        }) +
-        '::' +
-        app_sid,
-      'http' + (protocol ? 's' : '') + '://' + domain
+    const bodyHeight = document.body.scrollHeight
+    const windowHeight = window.innerHeight
+    const totalContentHeight = Math.max(bodyHeight, windowHeight)
+    // eslint-disable-next-line no-undef
+    const res = await BX24.resizeWindow(
+      window.innerWidth,
+      totalContentHeight + 20
     )
+    console.log(res)
   } catch (e) {
     console.error('resizeWindow', e)
   }
@@ -325,12 +316,17 @@ onBeforeMount(async () => {
     .catch((e: any) => {
       errorMessage.value = e
     })
-  console.log(inFrame.value)
   if (inFrame.value) {
-    setInterval(fixWindow, 2000)
+    // setInterval(fixWindow, 2000)
   }
 
 })
+
+onMounted(() => {
+  fixWindow()
+  console.log(bitrix)
+})
+
 async function handleSetAvatar() {
   try {
     setAvatar.value = true

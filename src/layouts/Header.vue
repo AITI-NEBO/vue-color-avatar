@@ -34,7 +34,7 @@ import { useStore } from '@/store'
 import { recordEvent } from '@/utils/ga'
 
 const store = useStore()
-console.log(store.$state.isAD)
+
 </script>
 
 <style lang="scss" scoped>
