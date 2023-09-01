@@ -3,104 +3,103 @@
     <Container>
       <div class="content-warpper">
         <div class="content-view">
-          <Header/>
+          <Header />
 
           <div class="playground">
             <div class="avatar-wrapper">
               <VueColorAvatar
-                  ref="colorAvatarRef"
-                  :option="avatarOption"
-                  :size="280"
-                  :style="{
+                ref="colorAvatarRef"
+                :option="avatarOption"
+                :size="280"
+                :style="{
                   transform: `rotateY(${flipped ? -180 : 0}deg)`,
                 }"
               />
               <div
-                  v-if="countArrayUser && countUser && setAvatarUsers"
-                  class="avatar-counter"
+                v-if="countArrayUser && countUser && setAvatarUsers"
+                class="avatar-counter"
               >
                 {{ countUser }}/{{ countArrayUser }} пользователей
               </div>
             </div>
 
-            <ActionBar @action="handleAction"/>
+            <ActionBar @action="handleAction" />
             <div v-show="store.$state.isAD" style="margin-top: 15px">
               <div
-                  class="ad"
-                  data-type="banner"
-                  data-width="100%"
-                  data-orientation="horizontal"
+                class="ad"
+                data-type="banner"
+                data-width="100%"
+                data-orientation="horizontal"
               ></div>
             </div>
 
             <div class="action-group">
               <button
-                  type="button"
-                  class="action-btn action-randomize"
-                  :disabled="store.$state.isAD"
-                  @click="store.$state.isAD ? '' : handleGenerate()"
+                type="button"
+                class="action-btn action-randomize"
+                :disabled="store.$state.isAD"
+                @click="store.$state.isAD ? '' : handleGenerate()"
               >
                 {{ t('action.randomize') }}
               </button>
 
               <button
-                  type="button"
-                  class="action-btn action-download"
-                  :disabled="downloading"
-                  @click="handleDownload"
+                type="button"
+                class="action-btn action-download"
+                :disabled="downloading"
+                @click="handleDownload"
               >
                 {{
                   downloading
-                      ? `${t('action.downloading')}...`
-                      : t('action.download')
+                    ? `${t('action.downloading')}...`
+                    : t('action.download')
                 }}
               </button>
 
               <button
-                  type="button"
-                  class="action-btn action-multiple"
-                  :disabled="store.$state.isAD"
-                  @click="() => (store.$state.isAD ? '' : generateMultiple())"
+                type="button"
+                class="action-btn action-multiple"
+                :disabled="store.$state.isAD"
+                @click="() => (store.$state.isAD ? '' : generateMultiple())"
               >
                 {{ t('action.downloadMultiple') }}
               </button>
 
               <button
-                  type="button"
-                  class="action-btn action-multiple"
-                  @click="() => handleSetAvatar()"
+                type="button"
+                class="action-btn action-multiple"
+                @click="() => handleSetAvatar()"
               >
                 {{
                   setAvatar
-                      ? `${t('action.setAvatarLoad')}...`
-                      : t('action.setAvatar')
+                    ? `${t('action.setAvatarLoad')}...`
+                    : t('action.setAvatar')
                 }}
               </button>
 
               <button
-                  type="button"
-                  class="action-btn action-multiple"
-                  @click="accessModal = true"
+                type="button"
+                class="action-btn action-multiple"
+                @click="accessModal = true"
               >
                 {{
                   setAvatarUsers
-                      ? `${t('action.setAvatarLoad')}...`
-                      : t('action.setAvatarAllUsers')
+                    ? `${t('action.setAvatarLoad')}...`
+                    : t('action.setAvatarAllUsers')
                 }}
               </button>
               <button
-                  v-if="setAvatarUsers"
-                  type="button"
-                  class="action-btn action-multiple action-btn--red"
-                  @click="breakButton = !breakButton"
+                v-if="setAvatarUsers"
+                type="button"
+                class="action-btn action-multiple action-btn--red"
+                @click="breakButton = !breakButton"
               >
                 Отмена
               </button>
-
             </div>
             <div
-                v-if="errorMessage"
-                style="
+              v-if="errorMessage"
+              style="
                 color: #ff4757;
                 position: relative;
                 top: 20px;
@@ -110,8 +109,8 @@
               {{ errorMessage }}
             </div>
             <div
-                v-if="successMessage"
-                style="
+              v-if="successMessage"
+              style="
                 color: #c3e88d;
                 position: relative;
                 top: 20px;
@@ -125,18 +124,18 @@
             </p>
           </div>
 
-          <Footer/>
+          <Footer />
 
-          <CodeModal :visible="codeVisible" @close="codeVisible = false"/>
+          <CodeModal :visible="codeVisible" @close="codeVisible = false" />
 
           <DownloadModal
-              :visible="downloadModalVisible"
-              :image-url="imageDataURL"
-              @close=";(downloadModalVisible = false), (imageDataURL = '')"
+            :visible="downloadModalVisible"
+            :image-url="imageDataURL"
+            @close=";(downloadModalVisible = false), (imageDataURL = '')"
           />
         </div>
 
-        <ConfettiCanvas/>
+        <ConfettiCanvas />
 
         <div class="gradient-bg">
           <div class="gradient-top"></div>
@@ -146,27 +145,27 @@
     </Container>
 
     <BatchDownloadModal
-        :visible="avatarListVisible"
-        :avatar-list="avatarList"
-        @regenerate="generateMultiple"
-        @close=";(avatarListVisible = false), (avatarList = [])"
+      :visible="avatarListVisible"
+      :avatar-list="avatarList"
+      @regenerate="generateMultiple"
+      @close=";(avatarListVisible = false), (avatarList = [])"
     />
     <ModalAccess
-        :visible="accessModal"
-        @click="handleSetAvatarAllUsers"
-        @close="accessModal = false"
+      :visible="accessModal"
+      @click="handleSetAvatarAllUsers"
+      @close="accessModal = false"
     />
 
     <Sider>
-      <Configurator/>
+      <Configurator />
     </Sider>
   </main>
 </template>
 
 <script lang="ts" setup>
-import type {Method} from '@sknebo/bitrix-js'
-import {computed, onBeforeMount, onMounted, ref, watchEffect} from 'vue'
-import {useI18n} from 'vue-i18n'
+import type { Method } from '@sknebo/bitrix-js'
+import { computed, onBeforeMount, onMounted, ref, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import ActionBar from '@/components/ActionBar.vue'
 import Configurator from '@/components/Configurator.vue'
@@ -178,14 +177,14 @@ import ModalWrapper from '@/components/Modal/ModalWrapper.vue'
 import VueColorAvatar, {
   type VueColorAvatarRef,
 } from '@/components/VueColorAvatar.vue'
-import {ActionType} from '@/enums'
-import {useAvatarOption} from '@/hooks'
+import { ActionType } from '@/enums'
+import { useAvatarOption } from '@/hooks'
 import Container from '@/layouts/Container.vue'
 import Footer from '@/layouts/Footer.vue'
 import Header from '@/layouts/Header.vue'
 import Sider from '@/layouts/Sider.vue'
-import {useStore} from '@/store'
-import {REDO, SET_AD, UNDO} from '@/store/mutation-type'
+import { useStore } from '@/store'
+import { REDO, SET_AD, UNDO } from '@/store/mutation-type'
 import {
   getRandomAvatarOption,
   getSpecialAvatarOption,
@@ -197,17 +196,17 @@ import {
   NOT_COMPATIBLE_AGENTS,
   TRIGGER_PROBABILITY,
 } from '@/utils/constant'
-import {recordEvent} from '@/utils/ga'
+import { recordEvent } from '@/utils/ga'
 
-import {name as appName} from '../package.json'
+import { name as appName } from '../package.json'
 import ConfettiCanvas from './components/ConfettiCanvas.vue'
-import type {AvatarOption} from './types'
+import type { AvatarOption } from './types'
 
 const store = useStore()
 
 const [avatarOption, setAvatarOption] = useAvatarOption()
 
-const {t} = useI18n()
+const { t } = useI18n()
 let errorMessage = ref('')
 let successMessage = ref('')
 let nextPageQuery = ref<number | undefined>(0)
@@ -216,13 +215,12 @@ let countUser = ref(0)
 let countArrayUser = ref(0)
 let accessModal = ref(false)
 
-
 function handleGenerate() {
   if (Math.random() <= TRIGGER_PROBABILITY) {
     let colorfulOption = getSpecialAvatarOption()
     while (
-        JSON.stringify(colorfulOption) === JSON.stringify(avatarOption.value)
-        ) {
+      JSON.stringify(colorfulOption) === JSON.stringify(avatarOption.value)
+    ) {
       colorfulOption = getSpecialAvatarOption()
     }
     colorfulOption.wrapperShape = avatarOption.value.wrapperShape
@@ -253,7 +251,7 @@ async function handleDownload() {
 
     const userAgent = window.navigator.userAgent.toLowerCase()
     const notCompatible = NOT_COMPATIBLE_AGENTS.some(
-        (agent) => userAgent.indexOf(agent) !== -1
+      (agent) => userAgent.indexOf(agent) !== -1
     )
 
     if (avatarEle) {
@@ -288,21 +286,19 @@ const inFrame = computed(() => !!window.name)
 
 onBeforeMount(async () => {
   await bitrix
-      .call('app.info' as Method, {})
-      .then((response: any) => {
-        if (response.result.STATUS === 'L') {
-          store[SET_AD](false)
-        }
-        if (response.result.STATUS === 'F') {
-          store[SET_AD](true)
-        }
-      })
-      .catch((e: any) => {
-        errorMessage.value = e
-      })
-
+    .call('app.info' as Method, {})
+    .then((response: any) => {
+      if (response.result.STATUS === 'L') {
+        store[SET_AD](false)
+      }
+      if (response.result.STATUS === 'F') {
+        store[SET_AD](true)
+      }
+    })
+    .catch((e: any) => {
+      errorMessage.value = e
+    })
 })
-
 
 async function handleSetAvatar() {
   try {
@@ -311,7 +307,7 @@ async function handleSetAvatar() {
 
     const userAgent = window.navigator.userAgent.toLowerCase()
     const notCompatible = NOT_COMPATIBLE_AGENTS.some(
-        (agent) => userAgent.indexOf(agent) !== -1
+      (agent) => userAgent.indexOf(agent) !== -1
     )
 
     if (avatarEle) {
@@ -328,40 +324,27 @@ async function handleSetAvatar() {
       } else {
         bitrix.call('profile' as Method, {}).then((response: any) => {
           const userData = {
-                ID: response.result.ID,
-                fields: {
-                  PERSONAL_PHOTO: {
-                      `${appName}.png`,
-                    `${dataURL}`.split('base64,')[1],
-              },
-              }
-        }
+            ID: response.result.ID,
+            fields: {
+              PERSONAL_PHOTO: [
+                `${appName}.png`,
+                `${dataURL}`.split('base64,')[1],
+              ],
+            },
+          }
           bitrix
-              .call('user.update' as Method, userData)
-              .then((response: any) => {
-                if (response.result) {
-                  showConfetti()
-                  successMessage.value = 'Аватар успешно установлен!'
-                  setAvatar.value = false
-                }
-              })
-              .catch(() => {
-                errorMessage.value = 'Ошибка при обновлении аватара пользователя'
+            .call('user.userfield.update' as Method, userData)
+            .then((response: any) => {
+              if (response.result) {
+                showConfetti()
+                successMessage.value = 'Аватар успешно установлен!'
                 setAvatar.value = false
-              })
-          // bitrix
-          //   .call('user.update' as Method, userData)
-          //   .then((response: any) => {
-          //     if (response.result) {
-          //       showConfetti()
-          //       successMessage.value = 'Аватар успешно установлен!'
-          //       setAvatar.value = false
-          //     }
-          //   })
-          //   .catch(() => {
-          //     errorMessage.value = 'Ошибка при обновлении аватара пользователя'
-          //     setAvatar.value = false
-          //   })
+              }
+            })
+            .catch(() => {
+              errorMessage.value = 'Ошибка при обновлении аватара пользователя'
+              setAvatar.value = false
+            })
         })
 
         recordEvent('click_download', {
@@ -382,102 +365,101 @@ async function handleSetAvatarAllUsers() {
     breakButton.value = false
 
     await bitrix
-        .call('user.admin' as Method, {})
-        .then(async (responseAdmin: any) => {
-          if (!responseAdmin.result) {
-            return (errorMessage.value = 'Нет прав для установки аватарок')
+      .call('user.admin' as Method, {})
+      .then(async (responseAdmin: any) => {
+        if (!responseAdmin.result) {
+          return (errorMessage.value = 'Нет прав для установки аватарок')
+        }
+        while (nextPageQuery.value != undefined && !breakButton.value) {
+          if (breakButton.value) {
+            setAvatarUsers.value = false
+            breakButton.value = false
+            break
           }
-          while (nextPageQuery.value != undefined && !breakButton.value) {
-            if (breakButton.value) {
-              setAvatarUsers.value = false
-              breakButton.value = false
-              break
-            }
-            await bitrix
-                .call('user.get' as Method, {
-                  FILTER: {
-                    PERSONAL_PHOTO: false,
-                  },
+          await bitrix
+            .call('user.get' as Method, {
+              FILTER: {
+                PERSONAL_PHOTO: false,
+              },
 
-                  start: nextPageQuery.value,
-                })
-                .then(async (response: any) => {
-                  if (!response.next) {
-                    nextPageQuery.value = undefined
+              start: nextPageQuery.value,
+            })
+            .then(async (response: any) => {
+              if (!response.next) {
+                nextPageQuery.value = undefined
+              }
+              nextPageQuery.value = response.next
+
+              countArrayUser.value = response.total
+              for (let i = 0; i < response.result.length; i++) {
+                if (breakButton.value) {
+                  setAvatarUsers.value = false
+
+                  break
+                }
+                countUser.value++
+
+                if (Math.random() <= TRIGGER_PROBABILITY) {
+                  let colorfulOption = getSpecialAvatarOption()
+                  while (
+                    JSON.stringify(colorfulOption) ===
+                    JSON.stringify(avatarOption.value)
+                  ) {
+                    colorfulOption = getSpecialAvatarOption()
                   }
-                  nextPageQuery.value = response.next
+                  colorfulOption.wrapperShape = avatarOption.value.wrapperShape
+                  setAvatarOption(colorfulOption)
+                } else {
+                  const randomOption = getRandomAvatarOption(avatarOption.value)
+                  setAvatarOption(randomOption)
+                }
+                const avatarEle = colorAvatarRef.value?.avatarRef
 
-                  countArrayUser.value = response.total
-                  for (let i = 0; i < response.result.length; i++) {
-                    if (breakButton.value) {
-                      setAvatarUsers.value = false
+                const userAgent = window.navigator.userAgent.toLowerCase()
+                const notCompatible = NOT_COMPATIBLE_AGENTS.some(
+                  (agent) => userAgent.indexOf(agent) !== -1
+                )
+                const html2canvas = (await import('html2canvas')).default
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                //@ts-ignore
+                const canvas = await html2canvas(avatarEle, {
+                  backgroundColor: null,
+                })
 
-                      break
-                    }
-                    countUser.value++
-
-                    if (Math.random() <= TRIGGER_PROBABILITY) {
-                      let colorfulOption = getSpecialAvatarOption()
-                      while (
-                          JSON.stringify(colorfulOption) ===
-                          JSON.stringify(avatarOption.value)
-                          ) {
-                        colorfulOption = getSpecialAvatarOption()
-                      }
-                      colorfulOption.wrapperShape = avatarOption.value.wrapperShape
-                      setAvatarOption(colorfulOption)
-                    } else {
-                      const randomOption = getRandomAvatarOption(avatarOption.value)
-                      setAvatarOption(randomOption)
-                    }
-                    const avatarEle = colorAvatarRef.value?.avatarRef
-
-                    const userAgent = window.navigator.userAgent.toLowerCase()
-                    const notCompatible = NOT_COMPATIBLE_AGENTS.some(
-                        (agent) => userAgent.indexOf(agent) !== -1
-                    )
-                    const html2canvas = (await import('html2canvas')).default
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    //@ts-ignore
-                    const canvas = await html2canvas(avatarEle, {
-                      backgroundColor: null,
+                const dataURL = canvas.toDataURL('image/png')
+                if (notCompatible) {
+                  imageDataURL.value = dataURL
+                  downloadModalVisible.value = true
+                } else {
+                  const userData = {
+                    ID: response.result[i].ID,
+                    PERSONAL_PHOTO: [
+                      `${appName}.png`,
+                      `${dataURL}`.split('base64,')[1],
+                    ],
+                  }
+                  bitrix
+                    .call('user.update' as Method, userData)
+                    .then((response: any) => {})
+                    .catch(() => {
+                      errorMessage.value =
+                        'Ошибка при обновлении аватара пользователя'
+                      setAvatar.value = false
+                      return
                     })
-
-                    const dataURL = canvas.toDataURL('image/png')
-                    if (notCompatible) {
-                      imageDataURL.value = dataURL
-                      downloadModalVisible.value = true
-                    } else {
-                      const userData = {
-                        ID: response.result[i].ID,
-                        PERSONAL_PHOTO: [
-                          `${appName}.png`,
-                          `${dataURL}`.split('base64,')[1],
-                        ],
-                      }
-                      bitrix
-                          .call('user.update' as Method, userData)
-                          .then((response: any) => {
-                          })
-                          .catch(() => {
-                            errorMessage.value =
-                                'Ошибка при обновлении аватара пользователя'
-                            setAvatar.value = false
-                            return
-                          })
-                    }
-                    if (response.total === countUser.value) {
-                      showConfetti()
-                      setAvatarUsers.value = false
-                    }
-                  }
-                })
-                .catch((e) => {
-                  errorMessage.value = e
-                })
-            continue
-          }
-        })
+                }
+                if (response.total === countUser.value) {
+                  showConfetti()
+                  setAvatarUsers.value = false
+                }
+              }
+            })
+            .catch((e) => {
+              errorMessage.value = e
+            })
+          continue
+        }
+      })
   } finally {
   }
 }
@@ -526,30 +508,30 @@ const avatarList = ref<AvatarOption[]>([])
 
 watchEffect(() => {
   avatarListVisible.value =
-      Array.isArray(avatarList.value) && avatarList.value.length > 0
+    Array.isArray(avatarList.value) && avatarList.value.length > 0
 })
 
 async function generateMultiple(count = 5 * 6) {
-  const {default: hash} = await import('object-hash')
+  const { default: hash } = await import('object-hash')
 
   const avatarMap = [...Array(count)].reduce<Map<string, AvatarOption>>(
-      (res) => {
-        let randomAvatarOption: AvatarOption
-        let hashKey: string
+    (res) => {
+      let randomAvatarOption: AvatarOption
+      let hashKey: string
 
-        do {
-          randomAvatarOption = getRandomAvatarOption(avatarOption.value)
-          hashKey = hash.sha1(randomAvatarOption)
-        } while (
-            randomAvatarOption.background.color === 'transparent' ||
-            res.has(hashKey)
-            )
+      do {
+        randomAvatarOption = getRandomAvatarOption(avatarOption.value)
+        hashKey = hash.sha1(randomAvatarOption)
+      } while (
+        randomAvatarOption.background.color === 'transparent' ||
+        res.has(hashKey)
+      )
 
-        res.set(hashKey, randomAvatarOption)
+      res.set(hashKey, randomAvatarOption)
 
-        return res
-      },
-      new Map()
+      return res
+    },
+    new Map()
   )
 
   avatarList.value = Array.from(avatarMap.values())
@@ -584,12 +566,10 @@ async function generateMultiple(count = 5 * 6) {
     }
   }
 }
-
 .avatar-counter {
   position: absolute;
   bottom: -25px;
 }
-
 .playground {
   display: flex;
   flex: 1;
@@ -638,7 +618,6 @@ async function generateMultiple(count = 5 * 6) {
       &:hover {
         color: lighten(var.$color-text, 10);
       }
-
       &--red {
         background: rgba(173, 12, 26, 0.63);
       }
@@ -672,11 +651,11 @@ async function generateMultiple(count = 5 * 6) {
       width: 100vh;
       height: 100vh;
       background-image: radial-gradient(
-              rgba($color, 0.8) 20%,
-              rgba($color, 0.6) 40%,
-              rgba($color, 0.4) 60%,
-              rgba($color, 0.2) 80%,
-              transparent 100%
+        rgba($color, 0.8) 20%,
+        rgba($color, 0.6) 40%,
+        rgba($color, 0.4) 60%,
+        rgba($color, 0.2) 80%,
+        transparent 100%
       );
       border-radius: 50%;
       opacity: 0.2;
